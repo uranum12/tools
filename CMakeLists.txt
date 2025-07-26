@@ -25,7 +25,13 @@ fetchcontent_declare(
     GIT_TAG 11.2.0)
 fetchcontent_makeavailable(fmtlib)
 
-find_package(libgit2 REQUIRED)
+find_package(PkgConfig REQUIRED)
+
+pkg_check_modules(LIBGIT2 REQUIRED libgit2)
+add_library(libgit2 INTERFACE IMPORTED)
+set_target_properties(
+    libgit2 PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${LIBGIT2_INCLUDE_DIRS}"
+                       INTERFACE_LINK_LIBRARIES "${LIBGIT2_LIBRARIES}")
 
 add_executable(zhist src/zhist.cpp)
 target_compile_features(zhist PRIVATE cxx_std_20)
@@ -36,7 +42,7 @@ add_executable(
             src/zprompt/ret.cpp src/zprompt/ssh.cpp src/zprompt/venv.cpp)
 target_compile_features(zprompt PRIVATE cxx_std_20)
 target_include_directories(zprompt PRIVATE include)
-target_link_libraries(zprompt PRIVATE libgit2::libgit2package argparse)
+target_link_libraries(zprompt PRIVATE libgit2 argparse)
 
 add_executable(zgreeting src/zgreeting.cpp)
 target_compile_features(zgreeting PRIVATE cxx_std_20)
@@ -44,7 +50,7 @@ target_link_libraries(zgreeting PRIVATE fmt::fmt)
 
 add_executable(tmux-status src/tmux-status.cpp)
 target_compile_features(tmux-status PRIVATE cxx_std_20)
-target_link_libraries(tmux-status PRIVATE libgit2::libgit2package argparse)
+target_link_libraries(tmux-status PRIVATE libgit2 argparse)
 
 _install(
     TARGETS
