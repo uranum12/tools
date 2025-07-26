@@ -54,7 +54,7 @@ add_executable(tmux-status src/tmux-status.cpp)
 target_compile_features(tmux-status PRIVATE cxx_std_20)
 target_link_libraries(tmux-status PRIVATE libgit2 argparse)
 
-add_executable(nvim-recent-files src/nvim-recent-files)
+add_executable(nvim-recent-files src/nvim-recent-files.cpp)
 target_compile_features(nvim-recent-files PRIVATE cxx_std_20)
 
 _install(
