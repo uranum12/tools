@@ -30,8 +30,10 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBGIT2 REQUIRED libgit2)
 add_library(libgit2 INTERFACE IMPORTED)
 set_target_properties(
-    libgit2 PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${LIBGIT2_INCLUDE_DIRS}"
-                       INTERFACE_LINK_LIBRARIES "${LIBGIT2_LIBRARIES}")
+    libgit2
+    PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${LIBGIT2_INCLUDE_DIRS}"
+               INTERFACE_LINK_DIRECTORIES "${LIBGIT2_LIBRARY_DIRS}"
+               INTERFACE_LINK_LIBRARIES "${LIBGIT2_LIBRARIES}")
 
 add_executable(zhist src/zhist.cpp)
 target_compile_features(zhist PRIVATE cxx_std_20)
