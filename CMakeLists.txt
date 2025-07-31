@@ -35,8 +35,18 @@ set_target_properties(
                INTERFACE_LINK_DIRECTORIES "${LIBGIT2_LIBRARY_DIRS}"
                INTERFACE_LINK_LIBRARIES "${LIBGIT2_LIBRARIES}")
 
-add_executable(zhist src/zhist.cpp)
+add_executable(
+    zhist
+    src/zhist.cpp
+    src/zhist/command/add.cpp
+    src/zhist/command/init.cpp
+    src/zhist/command/list.cpp
+    src/zhist/command/load.cpp
+    src/zhist/sql/insert.cpp
+    src/zhist/sql/misc.cpp
+    src/zhist/sql/select.cpp)
 target_compile_features(zhist PRIVATE cxx_std_20)
+target_include_directories(zhist PRIVATE include)
 target_link_libraries(zhist PRIVATE argparse SQLiteCpp sqlite3 pthread dl)
 
 add_executable(
