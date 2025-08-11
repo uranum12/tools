@@ -12,15 +12,13 @@ namespace fs = std::filesystem;
 
 namespace command {
 
-int list(const fs::path& db_path, bool is_all, bool is_recent) {
+int list(const fs::path& db_path, bool is_all, bool is_recent, int recent_num) {
     SQLite::Database db(db_path, SQLite::OPEN_READONLY);
 
     std::vector<std::string> cmds;
     if (is_all) {
         cmds = sql::select(db);
     } else if (is_recent) {
-        const int recent_num = 100;
-
         cmds = sql::select(db, recent_num);
     } else {
         auto cwd_path = fs::current_path();

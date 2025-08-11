@@ -1,23 +1,11 @@
 #include "zhist.hpp"
 
 #include <exception>
-#include <filesystem>
 #include <iostream>
-#include <stdexcept>
 #include <string>
 
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <argparse/argparse.hpp>
-
-namespace fs = std::filesystem;
-
-fs::path home_dir() {
-    const char* home = std::getenv("HOME");
-    if (home == nullptr) {
-        throw std::runtime_error("can't get HOME");
-    }
-    return fs::path(home);
-}
 
 int main(int argc, char* argv[]) {
     argparse::ArgumentParser program("zhist");
@@ -64,11 +52,10 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    auto db_dir = home_dir() / ".local/share/zhist";
-    auto db_path = db_dir / "zhist.db";
+    auto config = get_config();
 
     if (program.is_subcommand_used("init")) {
-        return command::init(db_path);
+        return command::init(config.db_path);
     }
 
     if (program.is_subcommand_used("add")) {
@@ -76,20 +63,21 @@ int main(int argc, char* argv[]) {
         auto dir = add_command.get<std::string>("--directory");
         auto ret = add_command.get<int>("--return-code");
 
-        return command::add(db_path, cmd, dir, ret);
+        return command::add(config.db_path, cmd, dir, ret);
     }
 
     if (program.is_subcommand_used("load")) {
         auto filename = load_command.get<std::string>("filename");
 
-        return command::load(db_path, filename);
+        return command::load(config.db_path, filename);
     }
 
     if (program.is_subcommand_used("list")) {
         auto is_all = list_command.get<bool>("--all");
         auto is_recent = list_command.get<bool>("--recent");
 
-        return command::list(db_path, is_all, is_recent);
+        return command::list(config.db_path, is_all, is_recent,
+                             config.recent_num);
     }
 
     std::cerr << program;

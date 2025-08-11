@@ -25,6 +25,12 @@ fetchcontent_declare(
     GIT_TAG 11.2.0)
 fetchcontent_makeavailable(fmtlib)
 
+fetchcontent_declare(
+    tomlplusplus
+    GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
+    GIT_TAG v3.4.0)
+fetchcontent_makeavailable(tomlplusplus)
+
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(LIBGIT2 REQUIRED libgit2)
@@ -42,12 +48,14 @@ add_executable(
     src/zhist/command/init.cpp
     src/zhist/command/list.cpp
     src/zhist/command/load.cpp
+    src/zhist/config.cpp
     src/zhist/sql/insert.cpp
     src/zhist/sql/misc.cpp
     src/zhist/sql/select.cpp)
 target_compile_features(zhist PRIVATE cxx_std_20)
 target_include_directories(zhist PRIVATE include)
-target_link_libraries(zhist PRIVATE argparse SQLiteCpp sqlite3 pthread dl)
+target_link_libraries(zhist PRIVATE argparse::argparse SQLiteCpp sqlite3
+                                    pthread dl tomlplusplus::tomlplusplus)
 
 add_executable(
     zprompt src/zprompt.cpp src/zprompt/cwd.cpp src/zprompt/git.cpp

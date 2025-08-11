@@ -10,6 +10,13 @@
 
 namespace fs = std::filesystem;
 
+struct Config {
+    fs::path db_path;
+    int recent_num;
+};
+
+Config get_config();
+
 inline bool is_command_valid(const std::string& cmd) {
     auto pos = cmd.find_first_not_of(" \t\n\v\f\r");
     return pos != std::string::npos && cmd[pos] != '#';
@@ -40,7 +47,7 @@ int add(const fs::path& db_path, const std::string& cmd, const std::string& dir,
 
 int load(const fs::path& db_path, const std::string& history_path);
 
-int list(const fs::path& db_path, bool is_all, bool is_recent);
+int list(const fs::path& db_path, bool is_all, bool is_recent, int recent_num);
 
 }  // namespace command
 
