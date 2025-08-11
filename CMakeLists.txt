@@ -1,35 +1,12 @@
 cmake_minimum_required(VERSION 3.11)
 project("tools" C CXX)
 
-include(FetchContent)
+include(cmake/get_cpm.cmake)
 
-# overwrite install() command with a dummy macro
-macro(install)
-    # nop
-endmacro()
-
-fetchcontent_declare(argparse
-                     GIT_REPOSITORY https://github.com/p-ranav/argparse.git)
-fetchcontent_makeavailable(argparse)
-
-set(SQLITECPP_INSTALL OFF)
-fetchcontent_declare(
-    sqlitecpp
-    GIT_REPOSITORY https://github.com/SRombauts/SQLiteCpp.git
-    GIT_TAG 3.3.3)
-fetchcontent_makeavailable(sqlitecpp)
-
-fetchcontent_declare(
-    fmtlib
-    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-    GIT_TAG 11.2.0)
-fetchcontent_makeavailable(fmtlib)
-
-fetchcontent_declare(
-    tomlplusplus
-    GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
-    GIT_TAG v3.4.0)
-fetchcontent_makeavailable(tomlplusplus)
+cpmaddpackage("gh:p-ranav/argparse#v3.2")
+cpmaddpackage("gh:SRombauts/SQLiteCpp#3.3.3")
+cpmaddpackage("gh:fmtlib/fmt#11.2.0")
+cpmaddpackage("gh:marzer/tomlplusplus#v3.4.0")
 
 find_package(PkgConfig REQUIRED)
 
@@ -75,13 +52,5 @@ target_link_libraries(tmux-status PRIVATE libgit2 argparse)
 add_executable(nvim-recent-files src/nvim-recent-files.cpp)
 target_compile_features(nvim-recent-files PRIVATE cxx_std_20)
 
-_install(
-    TARGETS
-    zhist
-    zprompt
-    zgreeting
-    tmux-status
-    nvim-recent-files
-    RUNTIME
-    DESTINATION
-    bin)
+install(TARGETS zhist zprompt zgreeting tmux-status nvim-recent-files
+        RUNTIME DESTINATION bin)
