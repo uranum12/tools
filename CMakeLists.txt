@@ -7,6 +7,7 @@ cpmaddpackage("gh:p-ranav/argparse#v3.2")
 cpmaddpackage("gh:SRombauts/SQLiteCpp#3.3.3")
 cpmaddpackage("gh:fmtlib/fmt#11.2.0")
 cpmaddpackage("gh:marzer/tomlplusplus#v3.4.0")
+cpmaddpackage("gh:Neargye/magic_enum#v0.9.7")
 
 find_package(PkgConfig REQUIRED)
 
@@ -35,11 +36,19 @@ target_link_libraries(zhist PRIVATE argparse::argparse SQLiteCpp sqlite3
                                     pthread dl tomlplusplus::tomlplusplus)
 
 add_executable(
-    zprompt src/zprompt.cpp src/zprompt/cwd.cpp src/zprompt/git.cpp
-            src/zprompt/ret.cpp src/zprompt/ssh.cpp src/zprompt/venv.cpp)
+    zprompt
+    src/zprompt.cpp
+    src/zprompt/config.cpp
+    src/zprompt/cwd.cpp
+    src/zprompt/git.cpp
+    src/zprompt/ret.cpp
+    src/zprompt/ssh.cpp
+    src/zprompt/venv.cpp)
 target_compile_features(zprompt PRIVATE cxx_std_20)
 target_include_directories(zprompt PRIVATE include)
-target_link_libraries(zprompt PRIVATE libgit2 argparse)
+target_link_libraries(
+    zprompt PRIVATE libgit2 argparse::argparse tomlplusplus::tomlplusplus
+                    magic_enum::magic_enum)
 
 add_executable(zgreeting src/zgreeting.cpp)
 target_compile_features(zgreeting PRIVATE cxx_std_20)

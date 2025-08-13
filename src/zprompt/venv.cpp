@@ -6,7 +6,7 @@
 #include <format>
 #include <string>
 
-std::string get_venv_status() {
+std::string get_venv_status(const Config& config) {
     std::string result;
 
     if (const char* venv_prompt_env = std::getenv("VIRTUAL_ENV_PROMPT");
@@ -16,7 +16,9 @@ std::string get_venv_status() {
                venv_env != nullptr && std::strlen(venv_env) > 0) {
         std::filesystem::path venv_path(venv_env);
         result = std::format("({}) ", venv_path.filename().string());
+    } else {
+        return "";
     }
 
-    return result;
+    return color_wrap(config.color_venv, result);
 }

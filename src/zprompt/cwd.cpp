@@ -1,34 +1,20 @@
 #include "zprompt.hpp"
 
 #include <algorithm>
-#include <array>
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <ranges>
 #include <string>
+#include <vector>
 
 namespace fs = std::filesystem;
 
 namespace {
 
-constexpr auto color_anchor = Color::magenta;
-constexpr auto color_normal = Color::blue;
-constexpr auto color_error = Color::red;
-
-constexpr auto pwd_markers = std::to_array({
-    ".git",
-    ".svn",
-    ".node-version",
-    ".python-version",
-    ".tool-versions",
-    "Cargo.toml",
-    "go.mod",
-    "package.json",
-});
-
-bool has_marker(const fs::path& dir) {
-    return std::ranges::any_of(pwd_markers, [&](const char* marker) {
+bool has_marker(const fs::path& dir,
+                const std::vector<std::string>& pwd_markers) {
+    return std::ranges::any_of(pwd_markers, [&](const std::string& marker) {
         return fs::exists(dir / marker);
     });
 }
@@ -38,8 +24,9 @@ bool is_subpath(const fs::path& base, const fs::path& path) {
     return std::ranges::equal(base, path | std::views::take(base_size));
 }
 
-std::string format_path(const fs::path& home_path, const fs::path& pwd_path) {
-    std::string result = color_wrap(color_normal, "~");
+std::string format_path(const fs::path& home_path, const fs::path& pwd_path,
+                        const Config& config) {
+    std::string result = color_wrap(config.color_pwd_normal, "~");
 
     if (home_path == pwd_path) {
         return result;
@@ -49,28 +36,28 @@ std::string format_path(const fs::path& home_path, const fs::path& pwd_path) {
 
     for (const auto& part : fs::relative(pwd_path, home_path)) {
         accumulated_path /= part;
-        if (has_marker(accumulated_path)) {
-            result += color_wrap(color_normal, "/") +
-                      color_wrap(color_anchor, part.string());
+        if (has_marker(accumulated_path, config.pwd_markers)) {
+            result += color_wrap(config.color_pwd_normal, "/") +
+                      color_wrap(config.color_pwd_anchor, part.string());
         } else {
-            result += color_wrap(color_normal, "/" + part.string());
+            result += color_wrap(config.color_pwd_normal, "/" + part.string());
         }
     }
 
     return result;
 }
 
-std::string format_path(const fs::path& pwd_path) {
+std::string format_path(const fs::path& pwd_path, const Config& config) {
     std::string result;
     auto accumulated_path = fs::path("/");
 
     for (const auto& part : pwd_path | std::views::drop(1)) {
         accumulated_path /= part;
-        if (has_marker(accumulated_path)) {
-            result += color_wrap(color_normal, "/") +
-                      color_wrap(color_anchor, part.string());
+        if (has_marker(accumulated_path, config.pwd_markers)) {
+            result += color_wrap(config.color_pwd_normal, "/") +
+                      color_wrap(config.color_pwd_anchor, part.string());
         } else {
-            result += color_wrap(color_normal, "/" + part.string());
+            result += color_wrap(config.color_pwd_normal, "/" + part.string());
         }
     }
 
@@ -79,7 +66,7 @@ std::string format_path(const fs::path& pwd_path) {
 
 }  // namespace
 
-std::string get_current_directory() {
+std::string get_current_directory(const Config& config) {
     try {
         auto pwd_path = fs::current_path();
 
@@ -87,12 +74,12 @@ std::string get_current_directory() {
         if (home_env != nullptr && strlen(home_env) > 0) {
             auto home_path = fs::path(home_env);
             if (is_subpath(home_path, pwd_path)) {
-                return format_path(home_path, pwd_path);
+                return format_path(home_path, pwd_path, config);
             }
         }
 
-        return format_path(pwd_path);
+        return format_path(pwd_path, config);
     } catch (const fs::filesystem_error& e) {
-        return color_wrap(color_error, "unknown");
+        return color_wrap(config.color_pwd_error, "unknown");
     }
 }

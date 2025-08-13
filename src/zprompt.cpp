@@ -13,17 +13,19 @@ int main(int argc, char* argv[]) {
     try {
         program.parse_args(argc, argv);
     } catch (const std::exception& err) {
-        std::cerr << err.what() << std::endl;
+        std::cerr << err.what() << '\n';
         return 1;
     }
 
+    auto config = get_config();
+
     auto ret = program.get<int>("return_code");
 
-    auto ssh_status = get_ssh_status();
-    auto cwd = get_current_directory();
-    auto git_status = get_git_status();
-    auto venv_status = get_venv_status();
-    auto return_code = get_return_code(ret);
+    auto ssh_status = get_ssh_status(config);
+    auto cwd = get_current_directory(config);
+    auto git_status = get_git_status(config);
+    auto venv_status = get_venv_status(config);
+    auto return_code = get_return_code(config, ret);
 
     std::cout << std::format("{}{}{}\n{}{}", ssh_status, cwd, git_status,
                              venv_status, return_code);
