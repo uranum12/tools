@@ -65,5 +65,9 @@ target_link_libraries(tmux-status PRIVATE libgit2 argparse)
 add_executable(nvim-recent-files src/nvim-recent-files.cpp)
 target_compile_features(nvim-recent-files PRIVATE cxx_std_20)
 
-install(TARGETS zhist zprompt zgreeting tmux-status nvim-recent-files
+add_executable(clean_ds src/clean_ds.cpp)
+target_compile_features(clean_ds PRIVATE cxx_std_20)
+target_link_libraries(clean_ds PRIVATE argparse)
+
+install(TARGETS zhist zprompt zgreeting tmux-status nvim-recent-files clean_ds
         RUNTIME DESTINATION bin)
