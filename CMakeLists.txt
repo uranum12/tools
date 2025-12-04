@@ -1,13 +1,20 @@
 cmake_minimum_required(VERSION 3.11)
 project("tools" C CXX)
 
-include(cmake/get_cpm.cmake)
+add_library(argparse INTERFACE)
+target_include_directories(argparse INTERFACE lib/argparse/include)
 
-cpmaddpackage("gh:p-ranav/argparse#v3.2")
-cpmaddpackage("gh:SRombauts/SQLiteCpp#3.3.3")
-cpmaddpackage("gh:fmtlib/fmt#11.2.0")
-cpmaddpackage("gh:marzer/tomlplusplus#v3.4.0")
-cpmaddpackage("gh:Neargye/magic_enum#v0.9.7")
+add_library(fmt INTERFACE)
+target_compile_definitions(fmt INTERFACE FMT_HEADER_ONLY=1)
+target_include_directories(fmt INTERFACE lib/fmt/include)
+
+add_library(tomlplusplus INTERFACE)
+target_include_directories(tomlplusplus INTERFACE lib/tomlplusplus/include)
+
+add_library(magic_enum INTERFACE)
+target_include_directories(magic_enum INTERFACE lib/magic_enum/include)
+
+find_package(SQLite3 REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 
@@ -32,8 +39,7 @@ add_executable(
     src/zhist/sql/select.cpp)
 target_compile_features(zhist PRIVATE cxx_std_20)
 target_include_directories(zhist PRIVATE include)
-target_link_libraries(zhist PRIVATE argparse::argparse SQLiteCpp sqlite3
-                                    pthread dl tomlplusplus::tomlplusplus)
+target_link_libraries(zhist PRIVATE argparse SQLite::SQLite3 tomlplusplus)
 
 add_executable(
     zprompt
@@ -46,13 +52,11 @@ add_executable(
     src/zprompt/venv.cpp)
 target_compile_features(zprompt PRIVATE cxx_std_20)
 target_include_directories(zprompt PRIVATE include)
-target_link_libraries(
-    zprompt PRIVATE libgit2 argparse::argparse tomlplusplus::tomlplusplus
-                    magic_enum::magic_enum)
+target_link_libraries(zprompt PRIVATE libgit2 argparse tomlplusplus magic_enum)
 
 add_executable(zgreeting src/zgreeting.cpp)
 target_compile_features(zgreeting PRIVATE cxx_std_20)
-target_link_libraries(zgreeting PRIVATE fmt::fmt)
+target_link_libraries(zgreeting PRIVATE fmt)
 
 add_executable(tmux-status src/tmux-status.cpp)
 target_compile_features(tmux-status PRIVATE cxx_std_20)

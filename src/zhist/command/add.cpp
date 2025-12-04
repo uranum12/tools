@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 
-#include <SQLiteCpp/SQLiteCpp.h>
+#include <sqlite3.h>
 
 namespace fs = std::filesystem;
 
@@ -25,9 +25,18 @@ int add(const fs::path& db_path, const std::string& cmd, const std::string& dir,
         auto now = std::chrono::system_clock::now();
         auto time = duration_cast<ms>(now.time_since_epoch()).count();
 
-        SQLite::Database db(db_path, SQLite::OPEN_READWRITE);
+        sqlite3* db = nullptr;
+        int rc = sqlite3_open_v2(db_path.c_str(), &db, SQLITE_OPEN_READWRITE,
+                                 nullptr);
+        if (rc != SQLITE_OK) {
+            std::cerr << "Can't open database: " << sqlite3_errmsg(db) << '\n';
+            sqlite3_close(db);
+            return 1;
+        }
 
         sql::insert(db, cmd, dir, code, time);
+
+        sqlite3_close(db);
     } catch (const std::exception& e) {
         std::cerr << e.what() << '\n';
         return 1;

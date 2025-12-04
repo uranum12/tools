@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include <SQLiteCpp/SQLiteCpp.h>
+#include <sqlite3.h>
 
 namespace command {
 
@@ -16,7 +16,14 @@ int load(const fs::path& db_path, const std::string& history_path) {
         return 1;
     }
 
-    SQLite::Database db(db_path, SQLite::OPEN_READWRITE);
+    sqlite3* db = nullptr;
+    int rc =
+        sqlite3_open_v2(db_path.c_str(), &db, SQLITE_OPEN_READWRITE, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Can't open database: " << sqlite3_errmsg(db) << '\n';
+        sqlite3_close(db);
+        return 1;
+    }
 
     std::string cmd;
     while (std::getline(ifs, cmd)) {
@@ -26,6 +33,8 @@ int load(const fs::path& db_path, const std::string& history_path) {
     }
 
     sql::delete_duplicate(db);
+
+    sqlite3_close(db);
 
     return 0;
 }

@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 
-#include <SQLiteCpp/SQLiteCpp.h>
 #include <argparse/argparse.hpp>
 
 int main(int argc, char* argv[]) {

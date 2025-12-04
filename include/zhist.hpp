@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include <SQLiteCpp/SQLiteCpp.h>
+#include <sqlite3.h>
 
 namespace fs = std::filesystem;
 
@@ -24,17 +24,17 @@ inline bool is_command_valid(const std::string& cmd) {
 
 namespace sql {
 
-void init(SQLite::Database& db);
+void init(sqlite3* db);
 
-void delete_duplicate(SQLite::Database& db);
+void delete_duplicate(sqlite3* db);
 
-void insert(SQLite::Database& db, const std::string& cmd,
-            const std::string& dir, int code, int64_t time);
-void insert(SQLite::Database& db, const std::string& cmd);
+void insert(sqlite3* db, const std::string& cmd, const std::string& dir,
+            int code, int64_t time);
+void insert(sqlite3* db, const std::string& cmd);
 
-std::vector<std::string> select(SQLite::Database& db);
-std::vector<std::string> select(SQLite::Database& db, const fs::path& cwd_path);
-std::vector<std::string> select(SQLite::Database& db, int limit);
+std::vector<std::string> select(sqlite3* db);
+std::vector<std::string> select(sqlite3* db, const fs::path& cwd_path);
+std::vector<std::string> select(sqlite3* db, int limit);
 
 }  // namespace sql
 

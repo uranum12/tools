@@ -1,6 +1,6 @@
 #include "zhist.hpp"
 
-#include <SQLiteCpp/SQLiteCpp.h>
+#include <sqlite3.h>
 
 constexpr auto sql_init_table = R"sql(
     CREATE TABLE IF NOT EXISTS histories (
@@ -45,13 +45,13 @@ constexpr auto sql_delete_duplicate = R"sql(
 
 namespace sql {
 
-void init(SQLite::Database& db) {
-    db.exec(sql_init_table);
-    db.exec(sql_init_index);
+void init(sqlite3* db) {
+    sqlite3_exec(db, sql_init_table, nullptr, nullptr, nullptr);
+    sqlite3_exec(db, sql_init_index, nullptr, nullptr, nullptr);
 }
 
-void delete_duplicate(SQLite::Database& db) {
-    db.exec(sql_delete_duplicate);
+void delete_duplicate(sqlite3* db) {
+    sqlite3_exec(db, sql_delete_duplicate, nullptr, nullptr, nullptr);
 }
 
 }  // namespace sql
