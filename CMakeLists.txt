@@ -15,6 +15,7 @@ add_library(magic_enum INTERFACE)
 target_include_directories(magic_enum INTERFACE lib/magic_enum/include)
 
 find_package(SQLite3 REQUIRED)
+find_package(exiv2 CONFIG NAMES exiv2)
 
 find_package(PkgConfig REQUIRED)
 
@@ -69,5 +70,18 @@ add_executable(clean_ds src/clean_ds.cpp)
 target_compile_features(clean_ds PRIVATE cxx_std_20)
 target_link_libraries(clean_ds PRIVATE argparse)
 
-install(TARGETS zhist zprompt zgreeting tmux-status nvim-recent-files clean_ds
-        RUNTIME DESTINATION bin)
+if(exiv2_FOUND)
+    add_executable(imgsort src/imgsort.cpp)
+    target_compile_features(imgsort PRIVATE cxx_std_20)
+    target_link_libraries(imgsort PRIVATE argparse fmt Exiv2::exiv2lib)
+endif()
+
+install(
+    TARGETS zhist
+            zprompt
+            zgreeting
+            tmux-status
+            nvim-recent-files
+            clean_ds
+            imgsort
+    RUNTIME DESTINATION bin)
