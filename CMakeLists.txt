@@ -14,6 +14,12 @@ target_include_directories(tomlplusplus INTERFACE lib/tomlplusplus/include)
 add_library(magic_enum INTERFACE)
 target_include_directories(magic_enum INTERFACE lib/magic_enum/include)
 
+add_library(cpp-httplib INTERFACE)
+target_include_directories(cpp-httplib INTERFACE lib/cpp-httplib/include)
+
+add_library(json INTERFACE)
+target_include_directories(json INTERFACE lib/json/include)
+
 find_package(SQLite3 REQUIRED)
 find_package(exiv2 CONFIG NAMES exiv2)
 
@@ -76,6 +82,10 @@ if(exiv2_FOUND)
     target_link_libraries(imgsort PRIVATE argparse fmt Exiv2::exiv2lib)
 endif()
 
+add_executable(translate src/translate.cpp)
+target_compile_features(translate PRIVATE cxx_std_20)
+target_link_libraries(translate PRIVATE argparse fmt cpp-httplib json)
+
 install(
     TARGETS zhist
             zprompt
@@ -84,4 +94,5 @@ install(
             nvim-recent-files
             clean_ds
             imgsort
+            translate
     RUNTIME DESTINATION bin)
