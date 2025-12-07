@@ -80,6 +80,8 @@ if(exiv2_FOUND)
     add_executable(imgsort src/imgsort.cpp)
     target_compile_features(imgsort PRIVATE cxx_std_20)
     target_link_libraries(imgsort PRIVATE argparse fmt Exiv2::exiv2lib)
+
+    install(TARGETS imgsort RUNTIME DESTINATION bin)
 endif()
 
 add_executable(translate src/translate.cpp)
@@ -93,6 +95,5 @@ install(
             tmux-status
             nvim-recent-files
             clean_ds
-            imgsort
             translate
     RUNTIME DESTINATION bin)
