@@ -61,6 +61,16 @@ std::string format_date(int year, int month, int day) {
     return fmt::format("{:04d}-{:02d}-{:02d}", year, month, day);
 }
 
+fs::path make_next_path(const fs::path& base_path, int num) {
+    const auto& parent = base_path.parent_path();
+    const auto& stem = base_path.stem().string();
+    const auto& ext = base_path.extension().string();
+
+    const auto& filename = fmt::format("{}-{}{}", stem, num, ext);
+
+    return parent / filename;
+}
+
 std::vector<std::pair<fs::path, fs::path>> search_target(
     const fs::path& source, const fs::path& output) {
     std::vector<std::pair<fs::path, fs::path>> vec_target;
@@ -108,10 +118,12 @@ std::vector<std::pair<fs::path, fs::path>> search_target(
         auto output_path =
             output / format_date(year, month, day) / img_path.filename();
 
-        if (fs::exists(output_path)) {
+        const auto base_path = output_path;
+        for (int num = 1; fs::exists(output_path); num++) {
             fmt::print(fmt::fg(fmt::terminal_color::yellow),
                        "File already exists: {}\n", output_path.string());
-            continue;
+
+            output_path = make_next_path(base_path, num);
         }
 
         vec_target.emplace_back(img_path, output_path);
