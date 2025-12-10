@@ -38,6 +38,20 @@ int main(int argc, char* argv[]) {
         .default_value(false)
         .implicit_value(true);
 
+    auto& view_group = list_command.add_mutually_exclusive_group();
+    view_group.add_argument("-e", "--escape")
+        .help("escape special charactors")
+        .default_value(false)
+        .implicit_value(true);
+    view_group.add_argument("--fzf")
+        .help("list commands for fzf --read0 --delimiter='\\t' --with-nth=1")
+        .default_value(false)
+        .implicit_value(true);
+    view_group.add_argument("--zsh-history")
+        .help("list commands for zsh-history")
+        .default_value(false)
+        .implicit_value(true);
+
     program.add_subparser(init_command);
     program.add_subparser(add_command);
     program.add_subparser(load_command);
@@ -75,8 +89,21 @@ int main(int argc, char* argv[]) {
         auto is_all = list_command.get<bool>("--all");
         auto is_recent = list_command.get<bool>("--recent");
 
-        return command::list(config.db_path, is_all, is_recent,
-                             config.recent_num);
+        auto is_escaped = list_command.get<bool>("--escape");
+        auto is_fzf = list_command.get<bool>("--fzf");
+        auto is_history = list_command.get<bool>("--zsh-history");
+
+        auto filter_mode = is_all      ? FilterMode::All
+                           : is_recent ? FilterMode::Recent
+                                       : FilterMode::CurrentPath;
+
+        auto view_mode = is_escaped   ? ViewMode::Escaped
+                         : is_fzf     ? ViewMode::FZF
+                         : is_history ? ViewMode::History
+                                      : ViewMode::Normal;
+
+        return command::list(config.db_path, config.recent_num, filter_mode,
+                             view_mode);
     }
 
     std::cerr << program;

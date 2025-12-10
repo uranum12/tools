@@ -22,6 +22,19 @@ inline bool is_command_valid(const std::string& cmd) {
     return pos != std::string::npos && cmd[pos] != '#';
 }
 
+enum class FilterMode : uint8_t {
+    All,
+    Recent,
+    CurrentPath,
+};
+
+enum class ViewMode : uint8_t {
+    Normal,
+    Escaped,
+    FZF,
+    History,
+};
+
 namespace sql {
 
 void init(sqlite3* db);
@@ -47,7 +60,8 @@ int add(const fs::path& db_path, const std::string& cmd, const std::string& dir,
 
 int load(const fs::path& db_path, const std::string& history_path);
 
-int list(const fs::path& db_path, bool is_all, bool is_recent, int recent_num);
+int list(const fs::path& db_path, int recent_num, FilterMode filter_mode,
+         ViewMode view_mode);
 
 }  // namespace command
 
