@@ -99,13 +99,43 @@ int main(int argc, char* argv[]) {
          }},
     };
 
+    std::string buffer;
+
     auto res = cli.Post(
         "/api/generate", httplib::Headers(), req.dump(), "application/json",
-        [](const char* data, size_t data_len) {
-            std::string chunk(data, data_len);
-            auto json = nlohmann::json::parse(chunk);
-            std::cout << json["response"].get<std::string>();
-            std::cout.flush();
+        [&](const char* data, size_t data_len) {
+            buffer.append(data, data_len);
+
+            size_t pos = 0;
+            while (true) {
+                size_t newline = buffer.find('\n', pos);
+                if (newline == std::string::npos) {
+                    break;
+                }
+
+                std::string line = buffer.substr(pos, newline - pos);
+
+                if (!line.empty()) {
+                    try {
+                        auto json = nlohmann::json::parse(line);
+
+                        if (json.contains("response")) {
+                            std::cout << json["response"].get<std::string>();
+                            std::cout.flush();
+                        }
+                    } catch (const std::exception& e) {
+                        std::cerr << "JSON parse error: " << e.what() << "\n";
+                        std::cerr << "line: " << line << "\n";
+                    }
+                }
+
+                pos = newline + 1;
+            }
+
+            if (pos > 0) {
+                buffer.erase(0, pos);
+            }
+
             return true;
         },
         nullptr);
